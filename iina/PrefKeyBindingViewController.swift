@@ -152,11 +152,11 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
     let result = Utility.quickPromptPanel(messageText: "New Input Configuration", informativeText: "Please enter a name for the new configuration.") { newName = $0 }
     if !result { return }
     guard !newName.isEmpty else {
-      Utility.showAlert(message: "The name cannot br empty.")
+      Utility.showAlert("config.empty_name")
       return
     }
     guard userConfigs[newName] == nil && PrefKeyBindingViewController.defaultConfigs[newName] == nil else {
-      Utility.showAlert(message: "The name already exists.")
+      Utility.showAlert("config.name_existing")
       return
     }
     // new file
@@ -170,7 +170,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
         do {
           try fm.removeItem(atPath: newFilePath)
         } catch {
-          Utility.showAlert(message: "Cannot delete the file.")
+          Utility.showAlert("error_deleting_file")
           return
         }
       } else {
@@ -180,7 +180,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
     }
     // - new file
     if !fm.createFile(atPath: newFilePath, contents: nil, attributes: nil) {
-      Utility.showAlert(message: "Cannot create config file.")
+      Utility.showAlert("config.cannot_crete")
       return
     }
     // save
@@ -202,7 +202,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
     let result = Utility.quickPromptPanel(messageText: "New Input Configuration", informativeText: "Please enter a name for the duplicated configuration.") { newName = $0 }
     if !result { return }
     if userConfigs[newName] != nil || PrefKeyBindingViewController.defaultConfigs[newName] != nil {
-      Utility.showAlert(message: "The name already exists.")
+      Utility.showAlert("config.name_existing")
       return
     }
     // copy
@@ -217,7 +217,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
         do {
           try fm.removeItem(atPath: newFilePath)
         } catch {
-          Utility.showAlert(message: "Cannot delete the file.")
+          Utility.showAlert("error_deleting_file")
           return
         }
       } else {
@@ -229,7 +229,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
     do {
       try fm.copyItem(atPath: currFilePath, toPath: newFilePath)
     } catch {
-      Utility.showAlert(message: "Cannot create config file.")
+      Utility.showAlert("config.cannot_create")
       return
     }
     // save
@@ -253,7 +253,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
     do {
       try FileManager.default.removeItem(atPath: currentConfFilePath)
     } catch {
-      Utility.showAlert(message: "Cannot delete config file!")
+      Utility.showAlert("error_deleting_file")
       return
     }
     userConfigs.removeValue(forKey: currentConfName)
@@ -280,7 +280,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
     do {
       try KeyMapping.generateConfData(from: currentMapping).write(toFile: currentConfFilePath, atomically: true, encoding: .utf8)
     } catch {
-      Utility.showAlert(message: "Cannot write to config file!")
+      Utility.showAlert("config.cannot_write")
     }
   }
 
@@ -301,8 +301,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
       // split
       let splitted = line.characters.split(separator: " ", maxSplits: 1)
       if splitted.count < 2 {
-        let alert = String(format: NSLocalizedString("alert.keybinding_config_error", comment: "Error setting keybinding configuration"), currentConfName)
-        Utility.showAlert(message: alert)
+        Utility.showAlert("keybinding_config.error", arguments: [currentConfName])
         let title = "IINA Default"
         currentConfName = title
         currentConfFilePath = getFilePath(forConfig: title)!
@@ -329,7 +328,7 @@ class PrefKeyBindingViewController: NSViewController, MASPreferencesViewControll
       return uv
     } else {
       if showAlert {
-        Utility.showAlert(message: "Cannot find config file location!")
+        Utility.showAlert("error_finding_file", arguments: ["config"])
       }
       return nil
     }
